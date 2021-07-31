@@ -57,3 +57,26 @@ sudo ip netns exec $NS1 ip r add default via 172.16.0.1 dev veth11
 sudo ip netns exec $NS1 ip r add 172.16.0.0/24 dev veth11
 sudo ip netns exec $NS2 ip r add default via 172.16.0.1 dev veth21
 sudo ip netns exec $NS2 ip r add 172.16.0.0/24 dev veth21
+
+# iptables part
+echo "NOW IPTABLES PART"
+
+echo "Clear existing iptables rules"
+sudo iptables -t filter -F && sudo iptables -t filter -X && sudo iptables -t nat -F && sudo iptables -t nat -X && sudo iptables -t raw -F && sudo iptables -t raw -X && sudo iptables -t mangle -F && sudo iptables -t mangle -X
+
+echo "Set policy table filter chain FORWARD to DROP"
+sudo iptables -t filter --policy FORWARD DROP
+
+echo "Accepting FORWARD traffic from our network namespaces to outside"
+sudo iptables -t filter -A FORWARD -i br0 ! -o br0 -j ACCEPT
+
+echo "Masquerade"
+sudo iptables -t nat -A POSTROUTING -s 172.16.0.0/24 ! -o br0 -j MASQUERADE
+
+echo "Allow established connections (allow traffic go back to source)"
+sudo iptables -A FORWARD -o br0 -m conntrack --ctstate RELATED,ESTABLISHED -c 0 0 -j ACCEPT
+
+echo "Allow ip_forward"
+sudo sysctl -w net.ipv4.ip_forward=1
+
+echo "NOW YOU CAN GO TO INTERNET FROM NETWORK NAMESPACES"
