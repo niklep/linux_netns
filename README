@@ -8,4 +8,4 @@ vagrantfile and scripts for explaining linux netns
 ip netns
 
 6. run commands in netns:
-ip netns exec <netns_name> <command_like_ping_or_ip>
+ip netns exec <netns_name> <network_commands_like_ping_google>
