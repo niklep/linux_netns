@@ -2,9 +2,10 @@ vagrantfile and scripts for explaining linux netns
 
 1. clone repo
 2. vagrant up
-3. run ./linux_netns
-4. list netns:
+3. vagrant ssh
+4. run ./linux_netns
+5. list netns:
 ip netns
 
-5. run commands in netns:
+6. run commands in netns:
 ip netns exec <netns_name> <command_like_ping_or_ip>
